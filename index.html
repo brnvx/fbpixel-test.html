@@ -62,7 +62,7 @@
             color: #555;
         }
         
-        input, select {
+        input, select, textarea {
             width: 100%;
             padding: 12px 15px;
             border: 1px solid var(--border-color);
@@ -71,7 +71,7 @@
             transition: border 0.3s;
         }
         
-        input:focus, select:focus {
+        input:focus, select:focus, textarea:focus {
             outline: none;
             border-color: var(--primary-color);
             box-shadow: 0 0 0 3px rgba(32, 165, 58, 0.1);
@@ -230,6 +230,38 @@
             font-size: 0.9rem;
         }
         
+        .multi-pixel-toggle {
+            margin-bottom: 1rem;
+            text-align: right;
+        }
+        
+        .multi-pixel-toggle button {
+            width: auto;
+            padding: 8px 15px;
+            font-size: 14px;
+            background-color: var(--info-color);
+        }
+        
+        .multi-pixel-toggle button:hover {
+            background-color: #2980b9;
+        }
+        
+        .multi-pixel-container {
+            display: none;
+            margin-bottom: 1rem;
+        }
+        
+        .multi-pixel-container textarea {
+            min-height: 100px;
+            font-family: monospace;
+        }
+        
+        .multi-pixel-hint {
+            font-size: 0.8rem;
+            color: #777;
+            margin-top: 0.5rem;
+        }
+        
         @media (max-width: 600px) {
             .container {
                 width: 95%;
@@ -252,7 +284,17 @@
         <h1>Advanced Pixel ID Event Activator</h1>
         <p class="description">Activate multiple Facebook Pixel events with custom parameters and repetition count.</p>
         
-        <div class="form-group">
+        <div class="multi-pixel-toggle">
+            <button id="toggleMultiPixel" onclick="toggleMultiPixelMode()">Enable Multiple Pixel IDs</button>
+        </div>
+        
+        <div class="multi-pixel-container" id="multiPixelContainer">
+            <label for="multi_pixel_ids">Multiple Pixel IDs (one per line):</label>
+            <textarea id="multi_pixel_ids" placeholder="Enter multiple Pixel IDs, one per line&#10;Example:&#10;123456789012345&#10;987654321098765&#10;555555555555555"></textarea>
+            <p class="multi-pixel-hint">You can enter up to 10 Pixel IDs. Each will receive all selected events.</p>
+        </div>
+        
+        <div class="form-group" id="singlePixelGroup">
             <label for="pixel_id">Facebook Pixel ID:</label>
             <input type="text" id="pixel_id" placeholder="Enter your Pixel ID (e.g., 123456789012345)" required>
         </div>
@@ -314,16 +356,60 @@
         let currentProcessing = null;
         let processedEvents = 0;
         let totalEventsToProcess = 0;
+        let isMultiPixelMode = false;
         
         // Initialize the page
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('currentYear').textContent = new Date().getFullYear();
         });
         
+        function toggleMultiPixelMode() {
+            const toggleBtn = document.getElementById('toggleMultiPixel');
+            const multiPixelContainer = document.getElementById('multiPixelContainer');
+            const singlePixelGroup = document.getElementById('singlePixelGroup');
+            
+            isMultiPixelMode = !isMultiPixelMode;
+            
+            if (isMultiPixelMode) {
+                toggleBtn.textContent = 'Use Single Pixel ID';
+                multiPixelContainer.style.display = 'block';
+                singlePixelGroup.style.display = 'none';
+            } else {
+                toggleBtn.textContent = 'Enable Multiple Pixel IDs';
+                multiPixelContainer.style.display = 'none';
+                singlePixelGroup.style.display = 'block';
+            }
+        }
+        
         function activatePixelEvents() {
             if (isProcessing) return;
             
-            const pixelId = document.getElementById('pixel_id').value.trim();
+            let pixelIds = [];
+            if (isMultiPixelMode) {
+                const multiPixelIds = document.getElementById('multi_pixel_ids').value.trim();
+                if (!multiPixelIds) {
+                    showResponse('Please enter at least one Pixel ID', 'error');
+                    return;
+                }
+                
+                pixelIds = multiPixelIds.split('\n')
+                    .map(id => id.trim())
+                    .filter(id => id.length > 0)
+                    .slice(0, 10); // Limit to 10 Pixel IDs
+                
+                if (pixelIds.length === 0) {
+                    showResponse('Please enter valid Pixel IDs', 'error');
+                    return;
+                }
+            } else {
+                const pixelId = document.getElementById('pixel_id').value.trim();
+                if (!pixelId) {
+                    showResponse('Please enter a valid Pixel ID', 'error');
+                    return;
+                }
+                pixelIds = [pixelId];
+            }
+            
             const eventCount = parseInt(document.getElementById('event_count').value);
             const delay = parseInt(document.getElementById('delay').value);
             const eventMode = document.getElementById('event_mode').value;
@@ -341,11 +427,6 @@
             eventLog.innerHTML = '';
             
             // Validate inputs
-            if (!pixelId) {
-                showResponse('Please enter a valid Pixel ID', 'error');
-                return;
-            }
-            
             if (isNaN(eventCount) || eventCount < 1 || eventCount > 1000) {
                 showResponse('Activation count must be between 1 and 1000', 'error');
                 return;
@@ -366,7 +447,7 @@
             const eventTypes = Array.from(eventCheckboxes).map(cb => cb.value);
             
             // Calculate total events to process
-            totalEventsToProcess = eventCount * eventTypes.length;
+            totalEventsToProcess = eventCount * eventTypes.length * pixelIds.length;
             processedEvents = 0;
             
             // Show UI elements
@@ -384,19 +465,19 @@
             isProcessing = true;
             
             // Log start
-            addToLog(`Starting processing of ${totalEventsToProcess} events...`);
+            addToLog(`Starting processing of ${totalEventsToProcess} events across ${pixelIds.length} Pixel IDs...`);
             
             // Process based on selected mode
             if (eventMode === 'sequential') {
-                processSequentially(pixelId, eventCount, delay, eventTypes);
+                processSequentially(pixelIds, eventCount, delay, eventTypes);
             } else {
-                processInParallel(pixelId, eventCount, delay, eventTypes);
+                processInParallel(pixelIds, eventCount, delay, eventTypes);
             }
         }
         
-        function processSequentially(pixelId, eventCount, delay, eventTypes) {
+        function processSequentially(pixelIds, eventCount, delay, eventTypes) {
             currentProcessing = {
-                pixelId,
+                pixelIds,
                 eventCount,
                 delay,
                 eventTypes,
@@ -410,23 +491,25 @@
                     return;
                 }
                 
-                // Process all event types for this iteration
-                eventTypes.forEach((eventType, i) => {
-                    setTimeout(() => {
-                        if (!isProcessing) return;
-                        
-                        sendPixelEvent(pixelId, eventType);
-                        processedEvents++;
-                        
-                        // Update UI
-                        updateProgress();
-                        addToLog(`Sent ${eventType} event to Pixel ID: ${pixelId}`);
-                        
-                        // Check if all events are processed
-                        if (processedEvents >= totalEventsToProcess) {
-                            finishProcessing();
-                        }
-                    }, i * 100); // Small stagger between event types
+                // Process all event types for all Pixel IDs for this iteration
+                pixelIds.forEach(pixelId => {
+                    eventTypes.forEach((eventType, i) => {
+                        setTimeout(() => {
+                            if (!isProcessing) return;
+                            
+                            sendPixelEvent(pixelId, eventType);
+                            processedEvents++;
+                            
+                            // Update UI
+                            updateProgress();
+                            addToLog(`Sent ${eventType} event to Pixel ID: ${pixelId}`);
+                            
+                            // Check if all events are processed
+                            if (processedEvents >= totalEventsToProcess) {
+                                finishProcessing();
+                            }
+                        }, i * 100); // Small stagger between event types
+                    });
                 });
                 
                 currentProcessing.currentIndex++;
@@ -441,10 +524,7 @@
             processNext();
         }
         
-        function processInParallel(pixelId, eventCount, delay, eventTypes) {
-            // For parallel processing, we'll send all events at once with the specified delay
-            // between each activation (but all event types in an activation will be sent together)
-            
+        function processInParallel(pixelIds, eventCount, delay, eventTypes) {
             let activationCounter = 0;
             
             function sendActivation() {
@@ -453,23 +533,25 @@
                     return;
                 }
                 
-                // Send all event types for this activation
-                eventTypes.forEach((eventType, i) => {
-                    setTimeout(() => {
-                        if (!isProcessing) return;
-                        
-                        sendPixelEvent(pixelId, eventType);
-                        processedEvents++;
-                        
-                        // Update UI
-                        updateProgress();
-                        addToLog(`Sent ${eventType} event to Pixel ID: ${pixelId}`);
-                        
-                        // Check if all events are processed
-                        if (processedEvents >= totalEventsToProcess) {
-                            finishProcessing();
-                        }
-                    }, i * 100); // Small stagger between event types
+                // Send all event types for all Pixel IDs for this activation
+                pixelIds.forEach(pixelId => {
+                    eventTypes.forEach((eventType, i) => {
+                        setTimeout(() => {
+                            if (!isProcessing) return;
+                            
+                            sendPixelEvent(pixelId, eventType);
+                            processedEvents++;
+                            
+                            // Update UI
+                            updateProgress();
+                            addToLog(`Sent ${eventType} event to Pixel ID: ${pixelId}`);
+                            
+                            // Check if all events are processed
+                            if (processedEvents >= totalEventsToProcess) {
+                                finishProcessing();
+                            }
+                        }, i * 100); // Small stagger between event types
+                    });
                 });
                 
                 activationCounter++;
