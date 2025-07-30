@@ -3,336 +3,566 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Advanced Purchase Tracker</title>
+    <title>Advanced Pixel ID Event Activator</title>
     <style>
         :root {
-            --primary: #1877f2;
-            --danger: #dc3545;
-            --success: #28a745;
-            --warning: #ffc107;
-            --dark: #343a40;
+            --primary-color: #20a53a;
+            --primary-hover: #148b29;
+            --secondary-color: #f0f0f0;
+            --border-color: #ddd;
+            --error-color: #e74c3c;
+            --success-color: #2ecc71;
+            --info-color: #3498db;
         }
-        body {
+        
+        * {
+            box-sizing: border-box;
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 20px;
-            background: #f8f9fa;
         }
+        
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9f9;
+            color: #333;
+            line-height: 1.6;
+        }
+        
         .container {
-            background: white;
-            padding: 25px;
-            border-radius: 8px;
-            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+            width: 90%;
+            max-width: 800px;
+            margin: 5% auto;
+            background-color: white;
+            padding: 2.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
         }
+        
         h1 {
-            color: var(--primary);
-            margin-top: 0;
+            color: var(--primary-color);
             text-align: center;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
         }
+        
+        .description {
+            text-align: center;
+            margin-bottom: 2rem;
+            color: #666;
+        }
+        
         .form-group {
-            margin-bottom: 20px;
+            margin-bottom: 1.5rem;
         }
+        
         label {
             display: block;
-            margin-bottom: 8px;
+            margin-bottom: 0.5rem;
             font-weight: 500;
+            color: #555;
         }
-        input {
+        
+        input, select {
             width: 100%;
-            padding: 12px;
-            border: 1px solid #ddd;
+            padding: 12px 15px;
+            border: 1px solid var(--border-color);
             border-radius: 6px;
             font-size: 16px;
-            box-sizing: border-box;
+            transition: border 0.3s;
         }
+        
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(32, 165, 58, 0.1);
+        }
+        
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .input-group input {
+            flex: 1;
+        }
+        
         button {
-            background: var(--primary);
+            width: 100%;
+            padding: 14px;
+            background-color: var(--primary-color);
             color: white;
             border: none;
-            padding: 14px 20px;
             border-radius: 6px;
             font-size: 16px;
-            cursor: pointer;
-            width: 100%;
-            transition: all 0.3s;
             font-weight: 500;
+            cursor: pointer;
+            transition: background-color 0.3s, transform 0.2s;
         }
+        
         button:hover {
-            background: #166fe5;
-            transform: translateY(-1px);
+            background-color: var(--primary-hover);
         }
+        
+        button:active {
+            transform: scale(0.98);
+        }
+        
         button:disabled {
-            background: #adb5bd;
+            background-color: #cccccc;
             cursor: not-allowed;
-            transform: none;
         }
-        #stopButton {
-            background: var(--danger);
-            margin-top: 10px;
-        }
-        #log {
-            margin-top: 25px;
-            border-top: 1px solid #eee;
-            padding-top: 15px;
-            max-height: 400px;
-            overflow-y: auto;
-        }
-        .log-entry {
-            padding: 12px;
+        
+        .response-area {
+            margin-top: 2rem;
+            padding: 1rem;
             border-radius: 6px;
-            margin-bottom: 10px;
-            background: #f8f9fa;
-            display: flex;
-            align-items: center;
-        }
-        .log-icon {
-            margin-right: 12px;
-            font-size: 20px;
-        }
-        .success {
-            background-color: rgba(40, 167, 69, 0.1);
-            border-left: 4px solid var(--success);
-        }
-        .error {
-            background-color: rgba(220, 53, 69, 0.1);
-            border-left: 4px solid var(--danger);
-        }
-        .warning {
-            background-color: rgba(255, 193, 7, 0.1);
-            border-left: 4px solid var(--warning);
-        }
-        .debug-info {
-            font-size: 12px;
-            color: var(--dark);
-            margin-top: 5px;
-            font-family: 'Courier New', monospace;
-        }
-        .progress-container {
-            margin: 20px 0;
             display: none;
         }
-        progress {
-            width: 100%;
-            height: 8px;
-            border-radius: 4px;
+        
+        .success {
+            background-color: rgba(46, 204, 113, 0.1);
+            border: 1px solid var(--success-color);
+            color: var(--success-color);
+            display: block;
         }
-        #progressText {
+        
+        .error {
+            background-color: rgba(231, 76, 60, 0.1);
+            border: 1px solid var(--error-color);
+            color: var(--error-color);
+            display: block;
+        }
+        
+        .info {
+            background-color: rgba(52, 152, 219, 0.1);
+            border: 1px solid var(--info-color);
+            color: var(--info-color);
+            display: block;
+        }
+        
+        .loading {
+            display: none;
             text-align: center;
-            margin-top: 5px;
+            margin: 1rem 0;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-radius: 50%;
+            border-top: 4px solid var(--primary-color);
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .event-types {
+            margin: 1.5rem 0;
+        }
+        
+        .event-types label {
+            display: inline-block;
+            margin-right: 1.5rem;
+            cursor: pointer;
+        }
+        
+        .event-types input[type="checkbox"] {
+            width: auto;
+            margin-right: 0.5rem;
+        }
+        
+        .progress-container {
+            width: 100%;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            margin: 1rem 0;
+            display: none;
+        }
+        
+        .progress-bar {
+            height: 20px;
+            background-color: var(--primary-color);
+            border-radius: 5px;
+            width: 0%;
+            transition: width 0.3s;
+            text-align: center;
+            color: white;
+            font-size: 12px;
+            line-height: 20px;
+        }
+        
+        .event-details {
+            margin-top: 1rem;
+            display: none;
+        }
+        
+        .event-log {
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--border-color);
+            border-radius: 5px;
+            padding: 10px;
+            background-color: #fafafa;
+            font-family: monospace;
             font-size: 14px;
-            color: var(--dark);
+        }
+        
+        .log-entry {
+            margin-bottom: 5px;
+            padding-bottom: 5px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .log-time {
+            color: #777;
+            margin-right: 10px;
+        }
+        
+        footer {
+            text-align: center;
+            margin-top: 2rem;
+            color: #777;
+            font-size: 0.9rem;
+        }
+        
+        @media (max-width: 600px) {
+            .container {
+                width: 95%;
+                padding: 1.5rem;
+            }
+            
+            .input-group {
+                flex-direction: column;
+            }
+            
+            .event-types label {
+                display: block;
+                margin-bottom: 0.8rem;
+            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Advanced Purchase Tracker</h1>
+        <h1>Advanced Pixel ID Event Activator</h1>
+        <p class="description">Activate multiple Facebook Pixel events with custom parameters and repetition count.</p>
         
         <div class="form-group">
-            <label for="pixelId">Facebook Pixel ID:</label>
-            <input type="text" id="pixelId" placeholder="Enter your Pixel ID" value="912964031023777">
+            <label for="pixel_id">Facebook Pixel ID:</label>
+            <input type="text" id="pixel_id" placeholder="Enter your Pixel ID (e.g., 123456789012345)" required>
         </div>
         
         <div class="form-group">
-            <label for="eventCount">Number of Purchases (1-100):</label>
-            <input type="number" id="eventCount" min="1" max="100" value="10">
+            <label for="event_count">Number of Activations:</label>
+            <input type="number" id="event_count" min="1" max="1000" value="1" placeholder="How many times to activate">
         </div>
         
-        <button id="trackButton">Start Purchase Tracking</button>
-        <button id="stopButton" disabled>Stop Tracking</button>
+        <div class="form-group">
+            <label for="delay">Delay between activations (ms):</label>
+            <input type="number" id="delay" min="0" max="10000" value="500" placeholder="Milliseconds between activations">
+        </div>
+        
+        <div class="form-group">
+            <label for="event_mode">Activation Mode:</label>
+            <select id="event_mode">
+                <option value="sequential">Sequential (one after another)</option>
+                <option value="parallel">Parallel (all at once)</option>
+            </select>
+        </div>
+        
+        <div class="event-types">
+            <strong>Select Events to Trigger:</strong><br>
+            <label><input type="checkbox" name="event_type" value="ViewContent" checked> ViewContent</label>
+            <label><input type="checkbox" name="event_type" value="AddToCart" checked> AddToCart</label>
+            <label><input type="checkbox" name="event_type" value="InitiateCheckout" checked> InitiateCheckout</label>
+            <label><input type="checkbox" name="event_type" value="Purchase" checked> Purchase</label>
+            <label><input type="checkbox" name="event_type" value="CompleteRegistration" checked> CompleteRegistration</label>
+        </div>
+        
+        <button id="activateBtn" onclick="activatePixelEvents()">Activate Pixel Events</button>
+        <button id="stopBtn" onclick="stopProcessing()" style="display: none; margin-top: 10px; background-color: var(--error-color);">Stop Processing</button>
         
         <div class="progress-container" id="progressContainer">
-            <progress id="progressBar" value="0" max="100"></progress>
-            <div id="progressText">Ready</div>
+            <div class="progress-bar" id="progressBar">0%</div>
         </div>
         
-        <div id="log"></div>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p id="loadingText">Processing events...</p>
+        </div>
+        
+        <div class="event-details" id="eventDetails">
+            <h3>Event Log</h3>
+            <div class="event-log" id="eventLog"></div>
+        </div>
+        
+        <div class="response-area" id="response"></div>
     </div>
+    
+    <footer>
+        Advanced Pixel ID Event Activator &copy; <span id="currentYear"></span> | Use responsibly
+    </footer>
 
     <script>
-        // Enhanced Facebook Pixel Tracking with Verification
-        let isTracking = false;
-        let stopRequested = false;
-        let originalFbq = null;
+        // Global variables to control the processing
+        let isProcessing = false;
+        let currentProcessing = null;
+        let processedEvents = 0;
+        let totalEventsToProcess = 0;
         
-        // Load Facebook Pixel script
-        !function(f,b,e,v,n,t,s){
-            if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-            n.queue=[];t=b.createElement(e);t.async=!0;
-            t.src=v;s=b.getElementsByTagName(e)[0];
-            s.parentNode.insertBefore(t,s)
-        }(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-
-        document.getElementById('trackButton').addEventListener('click', async function() {
-            if (isTracking) return;
+        // Initialize the page
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('currentYear').textContent = new Date().getFullYear();
+        });
+        
+        function activatePixelEvents() {
+            if (isProcessing) return;
             
-            const pixelId = document.getElementById('pixelId').value.trim();
-            let eventCount = parseInt(document.getElementById('eventCount').value);
+            const pixelId = document.getElementById('pixel_id').value.trim();
+            const eventCount = parseInt(document.getElementById('event_count').value);
+            const delay = parseInt(document.getElementById('delay').value);
+            const eventMode = document.getElementById('event_mode').value;
+            const responseDiv = document.getElementById('response');
+            const loadingDiv = document.getElementById('loading');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressBar = document.getElementById('progressBar');
+            const loadingText = document.getElementById('loadingText');
+            const eventDetails = document.getElementById('eventDetails');
+            const eventLog = document.getElementById('eventLog');
+            const activateBtn = document.getElementById('activateBtn');
+            const stopBtn = document.getElementById('stopBtn');
             
-            // Validate event count
-            eventCount = Math.min(100, Math.max(1, isNaN(eventCount) ? 10 : eventCount));
+            // Clear previous logs
+            eventLog.innerHTML = '';
             
+            // Validate inputs
             if (!pixelId) {
-                addLog("Please enter a valid Pixel ID", "error");
+                showResponse('Please enter a valid Pixel ID', 'error');
                 return;
             }
-
-            // Initialize tracking
-            isTracking = true;
-            stopRequested = false;
-            document.getElementById('trackButton').disabled = true;
-            document.getElementById('stopButton').disabled = false;
-            document.getElementById('progressContainer').style.display = 'block';
-            document.getElementById('progressBar').value = 0;
-            document.getElementById('log').innerHTML = '';
             
-            // Store original fbq function
-            originalFbq = window.fbq;
-            
-            // Initialize Pixel
-            fbq('init', pixelId);
-            addLog(`System initialized with Pixel ID: ${pixelId}`, "success");
-            
-            // Track purchases with verification
-            let successCount = 0;
-            for (let i = 1; i <= eventCount; i++) {
-                if (stopRequested) break;
-                
-                // Update progress
-                const progress = Math.round((i / eventCount) * 100);
-                document.getElementById('progressBar').value = progress;
-                document.getElementById('progressText').textContent = `Processing: ${i}/${eventCount} (${progress}%)`;
-                
-                const transactionId = 'T' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
-                const eventData = {
-                    currency: 'BRL',
-                    value: (Math.random() * 100 + 10).toFixed(2),
-                    contents: [{ id: 'product_' + Math.floor(Math.random() * 1000), quantity: 1 }],
-                    content_type: 'product',
-                    transaction_id: transactionId
-                };
-                
-                try {
-                    // Track with verification
-                    const result = await trackWithVerification(pixelId, eventData);
-                    
-                    if (result.success) {
-                        addLog(
-                            `✓ Purchase #${i} confirmed by Facebook`, 
-                            "success",
-                            `Transaction ID: ${transactionId}<br>Value: ${eventData.value} ${eventData.currency}<br>Event ID: ${result.eventId || 'N/A'}`
-                        );
-                        successCount++;
-                    } else {
-                        addLog(
-                            `⚠ Purchase #${i} not confirmed`, 
-                            "warning",
-                            `Transaction ID: ${transactionId}<br>Error: ${result.error || 'No response from Facebook'}`
-                        );
-                    }
-                } catch (error) {
-                    addLog(
-                        `✗ Purchase #${i} failed`, 
-                        "error",
-                        `Transaction ID: ${transactionId}<br>Error: ${error.message}`
-                    );
-                }
-                
-                // Add delay between events (300ms minimum)
-                if (i < eventCount && !stopRequested) {
-                    await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 200));
-                }
+            if (isNaN(eventCount) || eventCount < 1 || eventCount > 1000) {
+                showResponse('Activation count must be between 1 and 1000', 'error');
+                return;
             }
             
-            // Finalize tracking
-            const finalMessage = stopRequested 
-                ? `Tracking stopped after ${successCount} purchases`
-                : `Completed ${successCount} of ${eventCount} purchases`;
-            
-            addLog(
-                finalMessage,
-                successCount === eventCount ? "success" : "warning",
-                `Success rate: ${Math.round((successCount/eventCount)*100)}%`
-            );
-            
-            // Restore original fbq function
-            if (originalFbq) {
-                window.fbq = originalFbq;
+            if (isNaN(delay) || delay < 0 || delay > 10000) {
+                showResponse('Delay must be between 0 and 10000 milliseconds', 'error');
+                return;
             }
             
-            isTracking = false;
-            document.getElementById('trackButton').disabled = false;
-            document.getElementById('stopButton').disabled = true;
-            document.getElementById('progressText').textContent = "Ready";
-        });
-
-        // Enhanced tracking with Facebook response verification
-        function trackWithVerification(pixelId, eventData) {
-            return new Promise((resolve) => {
-                let verificationReceived = false;
-                const verificationTimeout = 5000; // 5 seconds timeout
-                
-                // Temporary override of fbq to capture response
-                const tempFbq = function() {
-                    // Check if this is our Purchase event response
-                    if (arguments[0] === 'track' && 
-                        arguments[1] === 'Purchase' && 
-                        arguments[2]?.transaction_id === eventData.transaction_id) {
-                        verificationReceived = true;
-                        resolve({ 
-                            success: true,
-                            eventId: arguments[2]?._eventID || arguments[2]?._trace_id 
-                        });
-                    }
-                    // Call original fbq
-                    originalFbq.apply(this, arguments);
-                };
-                
-                // Replace fbq temporarily
-                window.fbq = tempFbq;
-                
-                // Track the purchase event
-                originalFbq('track', 'Purchase', eventData);
-                
-                // Fallback timeout in case no response
-                setTimeout(() => {
-                    if (!verificationReceived) {
-                        resolve({ 
-                            success: false,
-                            error: "No confirmation received from Facebook" 
-                        });
-                    }
-                    // Restore original fbq
-                    window.fbq = originalFbq;
-                }, verificationTimeout);
-            });
+            // Get selected event types
+            const eventCheckboxes = document.querySelectorAll('input[name="event_type"]:checked');
+            if (eventCheckboxes.length === 0) {
+                showResponse('Please select at least one event type', 'error');
+                return;
+            }
+            
+            const eventTypes = Array.from(eventCheckboxes).map(cb => cb.value);
+            
+            // Calculate total events to process
+            totalEventsToProcess = eventCount * eventTypes.length;
+            processedEvents = 0;
+            
+            // Show UI elements
+            loadingDiv.style.display = 'block';
+            progressContainer.style.display = 'block';
+            eventDetails.style.display = 'block';
+            responseDiv.style.display = 'none';
+            activateBtn.disabled = true;
+            stopBtn.style.display = 'block';
+            
+            // Update progress
+            updateProgress();
+            
+            // Set processing flag
+            isProcessing = true;
+            
+            // Log start
+            addToLog(`Starting processing of ${totalEventsToProcess} events...`);
+            
+            // Process based on selected mode
+            if (eventMode === 'sequential') {
+                processSequentially(pixelId, eventCount, delay, eventTypes);
+            } else {
+                processInParallel(pixelId, eventCount, delay, eventTypes);
+            }
         }
-
-        document.getElementById('stopButton').addEventListener('click', function() {
-            if (isTracking) {
-                stopRequested = true;
-                document.getElementById('stopButton').disabled = true;
-                addLog("Tracking stopped by user", "warning");
+        
+        function processSequentially(pixelId, eventCount, delay, eventTypes) {
+            currentProcessing = {
+                pixelId,
+                eventCount,
+                delay,
+                eventTypes,
+                currentIndex: 0,
+                timeoutId: null
+            };
+            
+            function processNext() {
+                if (!isProcessing || currentProcessing.currentIndex >= eventCount) {
+                    finishProcessing();
+                    return;
+                }
+                
+                // Process all event types for this iteration
+                eventTypes.forEach((eventType, i) => {
+                    setTimeout(() => {
+                        if (!isProcessing) return;
+                        
+                        sendPixelEvent(pixelId, eventType);
+                        processedEvents++;
+                        
+                        // Update UI
+                        updateProgress();
+                        addToLog(`Sent ${eventType} event to Pixel ID: ${pixelId}`);
+                        
+                        // Check if all events are processed
+                        if (processedEvents >= totalEventsToProcess) {
+                            finishProcessing();
+                        }
+                    }, i * 100); // Small stagger between event types
+                });
+                
+                currentProcessing.currentIndex++;
+                
+                // Schedule next batch if we're still processing
+                if (isProcessing && currentProcessing.currentIndex < eventCount) {
+                    currentProcessing.timeoutId = setTimeout(processNext, Math.max(delay, eventTypes.length * 100));
+                }
             }
-        });
-
-        function addLog(message, type, debugInfo = "") {
-            const logElement = document.getElementById('log');
-            const entry = document.createElement('div');
-            entry.className = `log-entry ${type}`;
             
-            entry.innerHTML = `
-                <div class="log-icon">${type === "success" ? "✓" : type === "error" ? "✗" : "⚠"}</div>
-                <div>
-                    <div>${message}</div>
-                    ${debugInfo ? `<div class="debug-info">${debugInfo}</div>` : ''}
-                </div>
-            `;
+            // Start processing
+            processNext();
+        }
+        
+        function processInParallel(pixelId, eventCount, delay, eventTypes) {
+            // For parallel processing, we'll send all events at once with the specified delay
+            // between each activation (but all event types in an activation will be sent together)
             
-            logElement.prepend(entry);
+            let activationCounter = 0;
+            
+            function sendActivation() {
+                if (!isProcessing || activationCounter >= eventCount) {
+                    finishProcessing();
+                    return;
+                }
+                
+                // Send all event types for this activation
+                eventTypes.forEach((eventType, i) => {
+                    setTimeout(() => {
+                        if (!isProcessing) return;
+                        
+                        sendPixelEvent(pixelId, eventType);
+                        processedEvents++;
+                        
+                        // Update UI
+                        updateProgress();
+                        addToLog(`Sent ${eventType} event to Pixel ID: ${pixelId}`);
+                        
+                        // Check if all events are processed
+                        if (processedEvents >= totalEventsToProcess) {
+                            finishProcessing();
+                        }
+                    }, i * 100); // Small stagger between event types
+                });
+                
+                activationCounter++;
+                
+                // Schedule next activation if needed
+                if (isProcessing && activationCounter < eventCount) {
+                    setTimeout(sendActivation, delay);
+                }
+            }
+            
+            // Start processing
+            sendActivation();
+        }
+        
+        function sendPixelEvent(pixelId, eventType) {
+            // Create a unique event ID for tracking
+            const eventId = Date.now() + Math.floor(Math.random() * 1000);
+            
+            // In a real implementation, you would use the Facebook Pixel code:
+            // fbq('init', pixelId);
+            // fbq('track', eventType, {
+            //     content_name: 'Demo Product',
+            //     currency: 'USD',
+            //     value: 19.99,
+            //     event_id: eventId
+            // });
+            
+            // For this demo, we'll simulate with an image pixel
+            const pixelURL = `https://www.facebook.com/tr?id=${pixelId}&ev=${eventType}&noscript=1&event_id=${eventId}`;
+            const img = new Image();
+            img.src = pixelURL;
+            
+            // Return the event ID for tracking
+            return eventId;
+        }
+        
+        function updateProgress() {
+            const progress = Math.floor((processedEvents / totalEventsToProcess) * 100);
+            const progressBar = document.getElementById('progressBar');
+            const loadingText = document.getElementById('loadingText');
+            
+            progressBar.style.width = progress + '%';
+            progressBar.textContent = progress + '%';
+            loadingText.textContent = `Processing events... ${processedEvents}/${totalEventsToProcess}`;
+        }
+        
+        function addToLog(message) {
+            const eventLog = document.getElementById('eventLog');
+            const now = new Date();
+            const timeString = now.toLocaleTimeString() + '.' + now.getMilliseconds().toString().padStart(3, '0');
+            
+            const logEntry = document.createElement('div');
+            logEntry.className = 'log-entry';
+            logEntry.innerHTML = `<span class="log-time">[${timeString}]</span> ${message}`;
+            
+            eventLog.appendChild(logEntry);
+            eventLog.scrollTop = eventLog.scrollHeight;
+        }
+        
+        function finishProcessing() {
+            isProcessing = false;
+            clearTimeout(currentProcessing?.timeoutId);
+            currentProcessing = null;
+            
+            const loadingDiv = document.getElementById('loading');
+            const activateBtn = document.getElementById('activateBtn');
+            const stopBtn = document.getElementById('stopBtn');
+            
+            loadingDiv.style.display = 'none';
+            activateBtn.disabled = false;
+            stopBtn.style.display = 'none';
+            
+            if (processedEvents >= totalEventsToProcess) {
+                showResponse(`Successfully processed ${processedEvents} Pixel events!`, 'success');
+                addToLog('Processing completed successfully!');
+            } else {
+                showResponse(`Processing stopped. Completed ${processedEvents} of ${totalEventsToProcess} events.`, 'info');
+                addToLog(`Processing stopped. Completed ${processedEvents} of ${totalEventsToProcess} events.`);
+            }
+        }
+        
+        function stopProcessing() {
+            if (isProcessing) {
+                isProcessing = false;
+                addToLog('Processing stopped by user request');
+            }
+        }
+        
+        function showResponse(message, type) {
+            const responseDiv = document.getElementById('response');
+            responseDiv.textContent = message;
+            responseDiv.className = 'response-area ' + type;
+            responseDiv.style.display = 'block';
         }
     </script>
 </body>
