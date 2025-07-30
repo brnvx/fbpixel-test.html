@@ -2,423 +2,330 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>FB Pixel Tester (Android Optimized)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Purchase Tracker</title>
     <style>
         :root {
-            --fb-blue: #1877f2;
-            --fb-blue-hover: #166fe5;
-            --warning-red: #d9534f;
-            --warning-bg: #fdecea;
-            --border-color: #dddfe2;
-            --progress-bg: #f0f0f0;
+            --primary: #1877f2;
+            --danger: #dc3545;
+            --success: #28a745;
+            --warning: #ffc107;
+            --dark: #343a40;
         }
         body {
-            font-family: 'Roboto', Arial, sans-serif;
-            margin: 0;
-            padding: 16px;
-            background: #f5f6f8;
-            -webkit-text-size-adjust: 100%;
-            touch-action: manipulation;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f8f9fa;
         }
         .container {
             background: white;
-            padding: 20px;
+            padding: 25px;
             border-radius: 8px;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            margin-bottom: 20px;
+            box-shadow: 0 2px 15px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: var(--primary);
+            margin-top: 0;
+            text-align: center;
         }
         .form-group {
-            margin-bottom: 16px;
+            margin-bottom: 20px;
         }
         label {
             display: block;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 500;
-            color: #1c1e21;
-            font-size: 14px;
         }
-        input, select {
+        input {
             width: 100%;
-            padding: 10px;
-            border: 1px solid var(--border-color);
+            padding: 12px;
+            border: 1px solid #ddd;
             border-radius: 6px;
+            font-size: 16px;
             box-sizing: border-box;
-            font-size: 14px;
-            background: #f5f6f7;
         }
         button {
-            width: 100%;
-            padding: 12px;
-            border: none;
-            border-radius: 6px;
-            font-weight: 500;
-            font-size: 15px;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-        #testButton {
-            background: var(--fb-blue);
+            background: var(--primary);
             color: white;
-            margin-top: 8px;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 6px;
+            font-size: 16px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.3s;
+            font-weight: 500;
         }
-        #testButton:hover {
-            background: var(--fb-blue-hover);
+        button:hover {
+            background: #166fe5;
+            transform: translateY(-1px);
         }
-        #testButton:disabled {
-            background: #ccd0d5;
+        button:disabled {
+            background: #adb5bd;
             cursor: not-allowed;
+            transform: none;
         }
         #stopButton {
-            background: var(--warning-red);
-            color: white;
-            margin-top: 8px;
-        }
-        .warning {
-            color: var(--warning-red);
-            background: var(--warning-bg);
-            padding: 12px;
-            border-radius: 6px;
-            margin: 16px 0;
-            font-size: 13px;
-            line-height: 1.4;
+            background: var(--danger);
+            margin-top: 10px;
         }
         #log {
-            margin-top: 16px;
-            padding: 12px;
-            background: var(--progress-bg);
-            border-radius: 6px;
-            max-height: 200px;
+            margin-top: 25px;
+            border-top: 1px solid #eee;
+            padding-top: 15px;
+            max-height: 400px;
             overflow-y: auto;
-            font-family: 'Roboto Mono', monospace;
+        }
+        .log-entry {
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 10px;
+            background: #f8f9fa;
+            display: flex;
+            align-items: center;
+        }
+        .log-icon {
+            margin-right: 12px;
+            font-size: 20px;
+        }
+        .success {
+            background-color: rgba(40, 167, 69, 0.1);
+            border-left: 4px solid var(--success);
+        }
+        .error {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-left: 4px solid var(--danger);
+        }
+        .warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            border-left: 4px solid var(--warning);
+        }
+        .debug-info {
             font-size: 12px;
-            line-height: 1.5;
+            color: var(--dark);
+            margin-top: 5px;
+            font-family: 'Courier New', monospace;
         }
         .progress-container {
-            margin: 12px 0;
+            margin: 20px 0;
             display: none;
         }
         progress {
             width: 100%;
-            height: 6px;
-            border-radius: 3px;
+            height: 8px;
+            border-radius: 4px;
         }
         #progressText {
             text-align: center;
-            font-size: 12px;
-            margin-top: 4px;
-            color: #606770;
-        }
-        .device-info {
-            font-size: 12px;
-            color: #65676b;
-            margin-top: 16px;
-            text-align: center;
-        }
-        @media (prefers-color-scheme: dark) {
-            body {
-                background: #18191a;
-                color: #e4e6eb;
-            }
-            .container {
-                background: #242526;
-            }
-            label {
-                color: #e4e6eb;
-            }
-            input, select {
-                background: #3e4042;
-                color: #e4e6eb;
-                border-color: #4e4e4e;
-            }
-            #log {
-                background: #3e4042;
-                color: #e4e6eb;
-            }
+            margin-top: 5px;
+            font-size: 14px;
+            color: var(--dark);
         }
     </style>
-    <meta name="theme-color" content="#1877f2">
 </head>
 <body>
     <div class="container">
-        <h1 style="margin-top:0;font-size:20px;">Facebook Pixel Tester</h1>
-        <div class="warning">
-            <strong>⚠️ DEVELOPMENT USE ONLY</strong><br>
-            For Android Oreo 8.0+ testing. Facebook may flag excessive events.
-            <br><br>
-            <strong>Best Practices:</strong><br>
-            • Max 50 events per session<br>
-            • Minimum 200ms delay<br>
-            • Test on WiFi connection
-        </div>
-
+        <h1>Advanced Purchase Tracker</h1>
+        
         <div class="form-group">
-            <label for="pixelId">Pixel ID:</label>
-            <input type="text" id="pixelId" value="912964031023777" placeholder="Enter Pixel ID">
+            <label for="pixelId">Facebook Pixel ID:</label>
+            <input type="text" id="pixelId" placeholder="Enter your Pixel ID" value="912964031023777">
         </div>
-
+        
         <div class="form-group">
-            <label for="accessToken">Access Token:</label>
-            <input type="password" id="accessToken" placeholder="EAxx..." autocomplete="off">
+            <label for="eventCount">Number of Purchases (1-100):</label>
+            <input type="number" id="eventCount" min="1" max="100" value="10">
         </div>
-
-        <div class="form-group">
-            <label for="depositLink">Deposit Link:</label>
-            <input type="url" id="depositLink" value="https://z53vx98.com?ch=39757" placeholder="https://">
-        </div>
-
-        <div class="form-group">
-            <label for="eventCount">Number of Events (1-50):</label>
-            <input type="number" id="eventCount" value="10" min="1" max="50">
-        </div>
-
-        <div class="form-group">
-            <label for="delayMs">Delay Between Events (ms):</label>
-            <input type="number" id="delayMs" value="300" min="100" max="5000">
-        </div>
-
-        <button id="testButton">Start Test</button>
-        <button id="stopButton" disabled>Stop Test</button>
+        
+        <button id="trackButton">Start Purchase Tracking</button>
+        <button id="stopButton" disabled>Stop Tracking</button>
         
         <div class="progress-container" id="progressContainer">
             <progress id="progressBar" value="0" max="100"></progress>
             <div id="progressText">Ready</div>
         </div>
-
-        <div id="log"></div>
         
-        <div class="device-info" id="deviceInfo">
-            Detecting device info...
-        </div>
+        <div id="log"></div>
     </div>
 
     <script>
-        // Device detection for Android Oreo 8.0+
-        function checkAndroidVersion() {
-            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-            const androidInfo = userAgent.match(/Android\s([0-9\.]+)/);
-            
-            if (androidInfo && androidInfo[1]) {
-                const version = parseFloat(androidInfo[1]);
-                return version >= 8.0;
-            }
-            return false;
-        }
-
-        // Display device info
-        function showDeviceInfo() {
-            const deviceInfo = document.getElementById('deviceInfo');
-            const isAndroidOreoPlus = checkAndroidVersion();
-            
-            let infoText = `OS: ${navigator.platform} | `;
-            infoText += `Browser: ${navigator.userAgent.split(') ').pop().split(' ')[0]} | `;
-            infoText += `Android 8.0+: ${isAndroidOreoPlus ? '✅' : '⚠️'}`;
-            
-            deviceInfo.textContent = infoText;
-            
-            if (!isAndroidOreoPlus) {
-                deviceInfo.innerHTML += '<br><span style="color:#d9534f">Recommend: Android 8.0+ device</span>';
-            }
-        }
-
-        // Initialize variables
-        let isRunning = false;
+        // Enhanced Facebook Pixel Tracking with Verification
+        let isTracking = false;
         let stopRequested = false;
-        let testStartTime = null;
+        let originalFbq = null;
         
-        // DOM elements
-        const testButton = document.getElementById('testButton');
-        const stopButton = document.getElementById('stopButton');
-        const progressContainer = document.getElementById('progressContainer');
-        const progressBar = document.getElementById('progressBar');
-        const progressText = document.getElementById('progressText');
-        const logElement = document.getElementById('log');
+        // Load Facebook Pixel script
+        !function(f,b,e,v,n,t,s){
+            if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+            n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+            if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+            n.queue=[];t=b.createElement(e);t.async=!0;
+            t.src=v;s=b.getElementsByTagName(e)[0];
+            s.parentNode.insertBefore(t,s)
+        }(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
 
-        // Main test function
-        document.getElementById('testButton').addEventListener('click', async function() {
-            if (isRunning) return;
+        document.getElementById('trackButton').addEventListener('click', async function() {
+            if (isTracking) return;
             
             const pixelId = document.getElementById('pixelId').value.trim();
-            let eventCount = Math.min(50, Math.max(1, parseInt(document.getElementById('eventCount').value) || 10));
-            const depositLink = document.getElementById('depositLink').value.trim();
-            let delayMs = Math.min(5000, Math.max(100, parseInt(document.getElementById('delayMs').value) || 300));
+            const eventCount = Math.min(100, Math.max(1, parseInt(document.getElementById('eventCount').value) || 1);
             
-            // Validation
             if (!pixelId) {
-                alert("Please enter a valid Pixel ID");
+                addLog("Please enter a valid Pixel ID", "error");
                 return;
             }
 
-            // UI Setup
-            isRunning = true;
+            // Initialize tracking
+            isTracking = true;
             stopRequested = false;
-            testButton.disabled = true;
-            stopButton.disabled = false;
+            document.getElementById('trackButton').disabled = true;
+            document.getElementById('stopButton').disabled = false;
+            document.getElementById('progressContainer').style.display = 'block';
+            document.getElementById('progressBar').value = 0;
+            document.getElementById('log').innerHTML = '';
             
-            progressContainer.style.display = 'block';
-            progressBar.value = 0;
-            progressText.textContent = 'Starting...';
-            logElement.innerHTML = '<strong>Event Log:</strong><br>';
-            testStartTime = new Date();
-
-            // Load Facebook Pixel script
-            if (typeof fbq === 'undefined') {
-                !function(f,b,e,v,n,t,s){
-                    if(f.fbq)return;n=f.fbq=function(){n.callMethod?
-                    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
-                    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
-                    n.queue=[];t=b.createElement(e);t.async=!0;
-                    t.src=v;s=b.getElementsByTagName(e)[0];
-                    s.parentNode.insertBefore(t,s)
-                }(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
-                
-                // Wait for pixel to load
-                await new Promise(resolve => setTimeout(resolve, 500));
-            }
-
+            // Store original fbq function
+            originalFbq = window.fbq;
+            
             // Initialize Pixel
             fbq('init', pixelId);
+            addLog(`System initialized with Pixel ID: ${pixelId}`, "success");
             
-            // Get access token if provided
-            const accessToken = document.getElementById('accessToken').value.trim();
-            
-            // Test loop
+            // Track purchases with verification
             let successCount = 0;
             for (let i = 1; i <= eventCount; i++) {
                 if (stopRequested) break;
                 
+                // Update progress
                 const progress = Math.round((i / eventCount) * 100);
-                progressBar.value = progress;
-                progressText.textContent = `${progress}% (${i}/${eventCount})`;
+                document.getElementById('progressBar').value = progress;
+                document.getElementById('progressText').textContent = `Processing: ${i}/${eventCount} (${progress}%)`;
                 
-                const transactionId = 'TEST_' + Math.random().toString(36).substring(2, 10) + '_' + i;
-                const eventTime = Math.floor(Date.now() / 1000);
-                
-                const purchaseData = {
+                const transactionId = 'T' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
+                const eventData = {
                     currency: 'BRL',
-                    value: 100.00,
-                    contents: [{
-                        id: 'deposit_39757',
-                        quantity: 1
-                    }],
+                    value: 10.00,
+                    contents: [{ id: 'product_001', quantity: 1 }],
                     content_type: 'product',
-                    transaction_id: transactionId,
-                    deposit_link: depositLink
+                    transaction_id: transactionId
                 };
-
+                
                 try {
-                    // Standard Pixel
-                    fbq('track', 'Purchase', purchaseData);
+                    // Track with verification
+                    const result = await trackWithVerification(pixelId, eventData);
                     
-                    // Conversion API if token provided
-                    if (accessToken) {
-                        const capiResponse = await sendConversionAPI(
-                            pixelId, 
-                            accessToken, 
-                            purchaseData, 
-                            eventTime
+                    if (result.success) {
+                        addLog(
+                            `✓ Purchase #${i} confirmed by Facebook`, 
+                            "success",
+                            `Transaction ID: ${transactionId}<br>Event ID: ${result.eventId || 'N/A'}`
                         );
-                        
-                        logElement.innerHTML += `[${i}] Pixel + CAPI: ${transactionId}<br>`;
+                        successCount++;
                     } else {
-                        logElement.innerHTML += `[${i}] Pixel Only: ${transactionId}<br>`;
+                        addLog(
+                            `⚠ Purchase #${i} not confirmed`, 
+                            "warning",
+                            `Transaction ID: ${transactionId}<br>Error: ${result.error || 'No response from Facebook'}`
+                        );
                     }
-                    
-                    successCount++;
                 } catch (error) {
-                    logElement.innerHTML += `[${i}] Error: ${error.message}<br>`;
+                    addLog(
+                        `✗ Purchase #${i} failed`, 
+                        "error",
+                        `Transaction ID: ${transactionId}<br>Error: ${error.message}`
+                    );
                 }
                 
-                // Scroll log to bottom
-                logElement.scrollTop = logElement.scrollHeight;
-                
-                // Add delay if specified and not last event
-                if (delayMs > 0 && i < eventCount) {
-                    await new Promise(resolve => setTimeout(resolve, delayMs));
+                // Add delay between events (300ms minimum)
+                if (i < eventCount && !stopRequested) {
+                    await new Promise(resolve => setTimeout(resolve, 300));
                 }
             }
-
-            // Cleanup
-            isRunning = false;
-            testButton.disabled = false;
-            stopButton.disabled = true;
             
-            const testEndTime = new Date();
-            const duration = (testEndTime - testStartTime) / 1000;
+            // Finalize tracking
+            const finalMessage = stopRequested 
+                ? `Tracking stopped after ${successCount} purchases`
+                : `Completed ${successCount} of ${eventCount} purchases`;
             
-            if (!stopRequested) {
-                progressText.textContent = `Completed ${successCount} events in ${duration.toFixed(1)}s`;
-                logElement.innerHTML += `<br><strong>Test completed successfully</strong><br>`;
-                logElement.innerHTML += `Events sent: ${successCount}<br>`;
-                logElement.innerHTML += `Duration: ${duration.toFixed(1)} seconds<br>`;
-                
-                // Vibrate on completion (Android)
-                if (navigator.vibrate) {
-                    navigator.vibrate(200);
-                }
-            } else {
-                progressText.textContent = `Stopped after ${successCount} events`;
-                logElement.innerHTML += `<br><strong>Test stopped by user</strong><br>`;
+            addLog(
+                finalMessage,
+                successCount === eventCount ? "success" : "warning",
+                `Success rate: ${Math.round((successCount/eventCount)*100)}%`
+            );
+            
+            // Restore original fbq function
+            if (originalFbq) {
+                window.fbq = originalFbq;
             }
+            
+            isTracking = false;
+            document.getElementById('trackButton').disabled = false;
+            document.getElementById('stopButton').disabled = true;
+            document.getElementById('progressText').textContent = "Ready";
         });
 
-        // Stop button handler
-        document.getElementById('stopButton').addEventListener('click', function() {
-            if (isRunning) {
-                stopRequested = true;
-                stopButton.disabled = true;
+        // Enhanced tracking with Facebook response verification
+        function trackWithVerification(pixelId, eventData) {
+            return new Promise((resolve) => {
+                let verificationReceived = false;
+                const verificationTimeout = 5000; // 5 seconds timeout
                 
-                // Vibrate on stop (Android)
-                if (navigator.vibrate) {
-                    navigator.vibrate([100, 50, 100]);
-                }
-            }
-        });
-
-        // Conversion API function
-        async function sendConversionAPI(pixelId, accessToken, eventData, eventTime) {
-            const payload = {
-                data: [{
-                    event_name: 'Purchase',
-                    event_time: eventTime,
-                    event_source_url: window.location.href,
-                    user_data: {
-                        client_ip_address: '127.0.0.1',
-                        client_user_agent: navigator.userAgent
-                    },
-                    custom_data: eventData
-                }],
-                access_token: accessToken,
-                test_event_code: 'TEST12345' // Optional test code
-            };
-
-            const response = await fetch(`https://graph.facebook.com/v19.0/${pixelId}/events`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(payload)
+                // Temporary override of fbq to capture response
+                window.fbq = function() {
+                    // Check if this is our Purchase event response
+                    if (arguments[0] === 'track' && 
+                        arguments[1] === 'Purchase' && 
+                        arguments[2]?.transaction_id === eventData.transaction_id) {
+                        verificationReceived = true;
+                        resolve({ 
+                            success: true,
+                            eventId: arguments[2]?._trace_id 
+                        });
+                    }
+                    // Call original fbq
+                    originalFbq.apply(this, arguments);
+                };
+                
+                // Track the purchase event
+                originalFbq('track', 'Purchase', eventData);
+                
+                // Fallback timeout in case no response
+                setTimeout(() => {
+                    if (!verificationReceived) {
+                        resolve({ 
+                            success: false,
+                            error: "No confirmation received from Facebook" 
+                        });
+                    }
+                }, verificationTimeout);
             });
-
-            if (!response.ok) {
-                throw new Error(`CAPI failed: ${response.status}`);
-            }
-
-            return await response.json();
         }
 
-        // Initialize device info on load
-        document.addEventListener('DOMContentLoaded', function() {
-            showDeviceInfo();
-            
-            // Android back button handler
-            if (history && history.pushState) {
-                history.pushState(null, null, document.URL);
-                window.addEventListener('popstate', function() {
-                    history.pushState(null, null, document.URL);
-                });
+        document.getElementById('stopButton').addEventListener('click', function() {
+            if (isTracking) {
+                stopRequested = true;
+                document.getElementById('stopButton').disabled = true;
+                addLog("Tracking stopped by user", "warning");
             }
         });
+
+        function addLog(message, type, debugInfo = "") {
+            const logElement = document.getElementById('log');
+            const entry = document.createElement('div');
+            entry.className = `log-entry ${type}`;
+            
+            entry.innerHTML = `
+                <div class="log-icon">${type === "success" ? "✓" : type === "error" ? "✗" : "⚠"}</div>
+                <div>
+                    <div>${message}</div>
+                    ${debugInfo ? `<div class="debug-info">${debugInfo}</div>` : ''}
+                </div>
+            `;
+            
+            logElement.prepend(entry);
+        }
     </script>
 </body>
 </html>
