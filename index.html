@@ -230,22 +230,6 @@
             font-size: 0.9rem;
         }
         
-        /* Login form styles */
-        #loginContainer {
-            display: block;
-        }
-        
-        #mainContent {
-            display: none;
-        }
-        
-        .login-error {
-            color: var(--error-color);
-            margin-top: 10px;
-            text-align: center;
-            font-weight: 500;
-        }
-        
         @media (max-width: 600px) {
             .container {
                 width: 95%;
@@ -264,26 +248,7 @@
     </style>
 </head>
 <body>
-    <div class="container" id="loginContainer">
-        <h1>PORNHUB.COM</h1>
-        <p class="description">USE VPN TO OPEN THIS SITE A CIBAI</p>
-        
-        <div class="form-group">
-            <label for="username">babi guling:</label>
-            <input type="text" id="username" placeholder="babi" required>
-        </div>
-        
-        <div class="form-group">
-            <label for="password">lampha goreng:</label>
-            <input type="password" id="password" placeholder="kontol" required>
-        </div>
-        
-        <button id="loginBtn" onclick="checkLogin()">Login</button>
-        
-        <div class="login-error" id="loginError"></div>
-    </div>
-    
-    <div class="container" id="mainContent">
+    <div class="container">
         <h1>Advanced Pixel ID Event Activator</h1>
         <p class="description">Activate multiple Facebook Pixel events with custom parameters and repetition count.</p>
         
@@ -340,7 +305,7 @@
     </div>
     
     <footer>
-        babi guling enak &copy; <span id="currentYear"></span> | uhuhu
+        Advanced Pixel ID Event Activator &copy; <span id="currentYear"></span> | Use responsibly
     </footer>
 
     <script>
@@ -354,21 +319,6 @@
         document.addEventListener('DOMContentLoaded', function() {
             document.getElementById('currentYear').textContent = new Date().getFullYear();
         });
-        
-        function checkLogin() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            const loginError = document.getElementById('loginError');
-            
-            if (username === 'babi' && password === '236sadwedwe222x') {
-                // Successful login
-                document.getElementById('loginContainer').style.display = 'none';
-                document.getElementById('mainContent').style.display = 'block';
-            } else {
-                // Failed login
-                loginError.textContent = 'Invalid username or password';
-            }
-        }
         
         function activatePixelEvents() {
             if (isProcessing) return;
