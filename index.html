@@ -170,7 +170,10 @@
             if (isTracking) return;
             
             const pixelId = document.getElementById('pixelId').value.trim();
-            const eventCount = Math.min(100, Math.max(1, parseInt(document.getElementById('eventCount').value) || 1);
+            let eventCount = parseInt(document.getElementById('eventCount').value);
+            
+            // Validate event count
+            eventCount = Math.min(100, Math.max(1, isNaN(eventCount) ? 10 : eventCount));
             
             if (!pixelId) {
                 addLog("Please enter a valid Pixel ID", "error");
@@ -206,8 +209,8 @@
                 const transactionId = 'T' + Date.now() + '_' + Math.random().toString(36).substr(2, 8);
                 const eventData = {
                     currency: 'BRL',
-                    value: 10.00,
-                    contents: [{ id: 'product_001', quantity: 1 }],
+                    value: (Math.random() * 100 + 10).toFixed(2),
+                    contents: [{ id: 'product_' + Math.floor(Math.random() * 1000), quantity: 1 }],
                     content_type: 'product',
                     transaction_id: transactionId
                 };
@@ -220,7 +223,7 @@
                         addLog(
                             `✓ Purchase #${i} confirmed by Facebook`, 
                             "success",
-                            `Transaction ID: ${transactionId}<br>Event ID: ${result.eventId || 'N/A'}`
+                            `Transaction ID: ${transactionId}<br>Value: ${eventData.value} ${eventData.currency}<br>Event ID: ${result.eventId || 'N/A'}`
                         );
                         successCount++;
                     } else {
@@ -240,7 +243,7 @@
                 
                 // Add delay between events (300ms minimum)
                 if (i < eventCount && !stopRequested) {
-                    await new Promise(resolve => setTimeout(resolve, 300));
+                    await new Promise(resolve => setTimeout(resolve, 300 + Math.random() * 200));
                 }
             }
             
@@ -273,7 +276,7 @@
                 const verificationTimeout = 5000; // 5 seconds timeout
                 
                 // Temporary override of fbq to capture response
-                window.fbq = function() {
+                const tempFbq = function() {
                     // Check if this is our Purchase event response
                     if (arguments[0] === 'track' && 
                         arguments[1] === 'Purchase' && 
@@ -281,12 +284,15 @@
                         verificationReceived = true;
                         resolve({ 
                             success: true,
-                            eventId: arguments[2]?._trace_id 
+                            eventId: arguments[2]?._eventID || arguments[2]?._trace_id 
                         });
                     }
                     // Call original fbq
                     originalFbq.apply(this, arguments);
                 };
+                
+                // Replace fbq temporarily
+                window.fbq = tempFbq;
                 
                 // Track the purchase event
                 originalFbq('track', 'Purchase', eventData);
@@ -299,6 +305,8 @@
                             error: "No confirmation received from Facebook" 
                         });
                     }
+                    // Restore original fbq
+                    window.fbq = originalFbq;
                 }, verificationTimeout);
             });
         }
